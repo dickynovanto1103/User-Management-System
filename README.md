@@ -1,10 +1,11 @@
-# Go Entry Task: Dicky Novanto
+# User Management System
+## By: Dicky Novanto
 
 ## How to install the project
 ##### I. User Management System project Installation
 1. Install Go + setup `GOROOT`, `GOPATH`, `GOBIN`, and `PATH`
     - `GOROOT` value: depends where do you store go binary, for me I placed it in `/usr/local/go`
-    - `GOPATH` value: `pathToDirectory/goentrytask_dicky-novanto`
+    - `GOPATH` value: `pathToDirectory/User-Management-System`
     - `GOBIN` value: `$(go env GOPATH)/bin`
     - `PATH`: `export PATH=$PATH:$(go env GOPATH)/bin`
 2. Install text editor / IDE (I chose Visual Studio Code) + golint
@@ -19,7 +20,6 @@
 
     - `LOAD DATA LOCAL INFILE 'user.txt' INTO TABLE User;`
 8. Clone this project’s repository
-9. Checkout to branch: entry_task_development
 10. In the repository, add folder named assets and inside the folder, insert an image file named: default_profile_picture.png
 11. Setup go driver sql: `go get -u github.com/go-sql-driver/mysql`
 12. Setup profiling library: `go get -u github.com/pkg/profile`
