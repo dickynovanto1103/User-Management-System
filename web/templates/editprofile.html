@@ -1,0 +1,6 @@
+<h1>Editing profile on user Username: {{.Username}} Nickname: {{.Nickname}}</h1>
+
+<form action="/changeprofile" enctype="multipart/form-data" method="POST">
+    <input type="file" name="profile" accept=".jpg, .png, .jpeg" required><br>
+    <input type="submit" value="Save changes">
+</form>
