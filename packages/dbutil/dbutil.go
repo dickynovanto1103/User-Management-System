@@ -20,7 +20,7 @@ const (
 	ErrorUpdateProfile  = "ErrorUpdateProfile"
 )
 
-func PrepareDB(config config.ConfigDB) {
+func PrepareDB(config c) {
 	var err error
 	db, err = sql.Open(config.DriverName, config.Username+":"+config.Password+"@/"+config.DBName)
 	if err != nil {
