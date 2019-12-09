@@ -206,8 +206,8 @@ func main() {
 	gob.Register(http.Cookie{})
 	gob.Register(response.Response{})
 
-	configDB := config.LoadConfigDB("../config/configDB.json")
-	configRedis := config.LoadConfigRedis("../config/configRedis.json")
+	configDB := config.LoadConfigDB("config/configDB.json")
+	configRedis := config.LoadConfigRedis("config/configRedis.json")
 
 	redisutil.CreateRedisClient(configRedis)
 
