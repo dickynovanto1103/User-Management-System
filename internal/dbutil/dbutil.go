@@ -1,10 +1,11 @@
 package dbutil
 
 import (
-	"config"
 	"database/sql"
 	"log"
-	"user"
+
+	"github.com/dickynovanto1103/User-Management-System/internal/config"
+	"github.com/dickynovanto1103/User-Management-System/internal/user"
 )
 
 var db *sql.DB
@@ -20,7 +21,7 @@ const (
 	ErrorUpdateProfile  = "ErrorUpdateProfile"
 )
 
-func PrepareDB(config c) {
+func PrepareDB(config config.ConfigDB) {
 	var err error
 	db, err = sql.Open(config.DriverName, config.Username+":"+config.Password+"@/"+config.DBName)
 	if err != nil {

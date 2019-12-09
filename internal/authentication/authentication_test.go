@@ -1,8 +1,9 @@
 package authentication
 
 import (
-	"stringutil"
 	"testing"
+
+	"github.com/dickynovanto1103/User-Management-System/internal/stringutil"
 )
 
 func TestVerifyPassword(t *testing.T) {

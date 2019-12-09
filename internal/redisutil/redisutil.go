@@ -1,9 +1,10 @@
 package redisutil
 
 import (
-	"config"
 	"log"
 	"time"
+
+	"github.com/dickynovanto1103/User-Management-System/internal/config"
 
 	"github.com/go-redis/redis"
 )

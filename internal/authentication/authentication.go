@@ -2,10 +2,11 @@ package authentication
 
 import (
 	"crypto/sha512"
-	"dbutil"
+
 	"encoding/hex"
 	"errors"
 
+	"github.com/dickynovanto1103/User-Management-System/internal/dbutil"
 	"golang.org/x/crypto/pbkdf2"
 )
 

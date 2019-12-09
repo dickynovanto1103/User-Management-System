@@ -1,20 +1,24 @@
 package main
 
 import (
-	"authentication"
-	"config"
-	"dbutil"
 	"encoding/gob"
 	"log"
 	"net"
 	"net/http"
-	"redisutil"
-	"request"
-	"response"
-	"stringutil"
 	"time"
 
-	"user"
+	"github.com/dickynovanto1103/User-Management-System/internal/redisutil"
+	"github.com/dickynovanto1103/User-Management-System/internal/request"
+	"github.com/dickynovanto1103/User-Management-System/internal/response"
+	"github.com/dickynovanto1103/User-Management-System/internal/stringutil"
+
+	"github.com/dickynovanto1103/User-Management-System/internal/config"
+
+	"github.com/dickynovanto1103/User-Management-System/internal/dbutil"
+
+	"github.com/dickynovanto1103/User-Management-System/internal/authentication"
+
+	"github.com/dickynovanto1103/User-Management-System/internal/user"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/pkg/profile"
