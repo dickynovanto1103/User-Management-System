@@ -1,11 +1,12 @@
 version: '3'
 services:
-    tcpserver:
-        build: .
-        ports:
-            - "8081:8000"
     redis:
         image: "redis:alpine"
+        restart: always
+        ports:
+            - "6379:6379"
+        expose:
+            - "6379"
     db:
         image: "mysql:8.0"
         restart: always
@@ -18,10 +19,5 @@ services:
             - "3306:3306"
         expose: 
             - "3306"
-        volumes:
-            - my-db:/var/lib/mysql
-
-volumes:
-    my-db:
 
 
