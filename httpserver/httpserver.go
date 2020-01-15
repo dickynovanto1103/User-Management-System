@@ -250,16 +250,8 @@ func main() {
 	gob.Register(user.User{})
 	gob.Register(request.Request{})
 	gob.Register(http.Cookie{})
-	http.HandleFunc("/login/", handleLogin)
-	http.HandleFunc("/authenticate", handleAuthenticate)
-	http.HandleFunc("/register/", handleRegister)
-	http.HandleFunc("/registerAuth", handleRegisterAuth)
-	http.HandleFunc("/info/", handleInfo)
 
-	http.HandleFunc("/editnickname/", handleEditNickname)
-	http.HandleFunc("/editprofile/", handleEditProfile)
-	http.HandleFunc("/changenickname", handleChangeNickname)
-	http.HandleFunc("/changeprofile", handleChangeProfile)
+	handleRouting()
 
 	log.Println("start generating connections")
 	err := connPool.CreatePool(connection.MaxConnections)
