@@ -63,6 +63,14 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleRegister(w http.ResponseWriter, r *http.Request) {
+	err := templates.ExecuteTemplate(w, "register.html", nil)
+	if err != nil {
+		log.Println("error in executing template register", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func sendLoginInformation(r *http.Request, conn net.Conn) error {
 	username := r.FormValue(user.CodeUsername)
 	password := r.FormValue(user.CodePassword)
@@ -120,6 +128,13 @@ func handleAuthenticate(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
+}
+
+func handleRegisterAuth(w http.ResponseWriter, r *http.Request) {
+	username := r.FormValue("username")
+	nickname := r.FormValue("nickname")
+	password := r.FormValue("password")
+	log.Println(username, nickname, password)
 }
 
 func getUserDataFromTCPServer(w http.ResponseWriter, r *http.Request, conn net.Conn) (user.User, error) {
@@ -237,6 +252,8 @@ func main() {
 	gob.Register(http.Cookie{})
 	http.HandleFunc("/login/", handleLogin)
 	http.HandleFunc("/authenticate", handleAuthenticate)
+	http.HandleFunc("/register/", handleRegister)
+	http.HandleFunc("/registerAuth", handleRegisterAuth)
 	http.HandleFunc("/info/", handleInfo)
 
 	http.HandleFunc("/editnickname/", handleEditNickname)
