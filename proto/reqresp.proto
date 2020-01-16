@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package proto;
+
+import "google/protobuf/any.proto";
+
+service UserDataService {
+    rpc SendRequest(Request) returns (Response) {}
+}
+
+message Request {
+    int32 RequestID = 1;
+    map<string, google.protobuf.Any> mapper = 2;
+}
+
+message Response {
+    int32 ResponseID = 1;
+    map<string, google.protobuf.Any> mapper = 2;
+}

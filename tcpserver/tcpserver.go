@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"encoding/gob"
+	"google.golang.org/grpc"
 	"log"
 	"net"
 	"net/http"
@@ -22,7 +24,18 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/pkg/profile"
+
+	pb "github.com/dickynovanto1103/User-Management-System/proto"
 )
+
+
+type server struct {
+	pb.UnimplementedUserDataServiceServer
+}
+
+func (s *server) SendRequest(ctx context.Context, in *pb.Request) (*pb.Response, error) {
+	return nil,nil
+}
 
 func handleAuthentication(conn net.Conn, req request.Request) {
 	username := req.Data[user.CodeUsername].(string)
@@ -217,6 +230,14 @@ func main() {
 	if err != nil {
 		log.Println("error found in listening: ", err)
 	}
+
+	grpcServer := grpc.NewServer()
+	pb.RegisterUserDataServiceServer(grpcServer, &server{})
+	log.Println("halo sini")
+	if err := grpcServer.Serve(listener); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
+	log.Println("halo")
 
 	dbutil.PrepareDB(configDB)
 	defer dbutil.CloseDB()
