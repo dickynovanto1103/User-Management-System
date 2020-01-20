@@ -233,11 +233,9 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterUserDataServiceServer(grpcServer, &server{})
-	log.Println("halo sini")
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
-	log.Println("halo")
 
 	dbutil.PrepareDB(configDB)
 	defer dbutil.CloseDB()
