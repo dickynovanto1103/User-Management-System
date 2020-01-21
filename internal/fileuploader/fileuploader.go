@@ -21,7 +21,7 @@ func UploadFile(r *http.Request, fieldname string, username string) (string, err
 
 	filename := username + handler.Filename
 
-	f, err := os.OpenFile("../assets/"+username+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+	f, err := os.OpenFile("./assets/"+username+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		log.Println("error in opening file: ", err)
 		return "", err
