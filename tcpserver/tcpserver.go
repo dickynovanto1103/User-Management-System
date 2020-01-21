@@ -165,7 +165,7 @@ func handleUpdateNickname(mapper map[string]string) response.Response {
 	return sendResponseBack(username, err)
 }
 
-func handleUpdateProfile(mapper map[string]string) response.Response{
+func handleUpdateProfile(mapper map[string]string) response.Response {
 	profile := mapper[user.CodeProfile]
 	userIDFromCookie := mapper[user.CodeCookie]
 	username, err := redisutil.Get(userIDFromCookie)
@@ -174,7 +174,6 @@ func handleUpdateProfile(mapper map[string]string) response.Response{
 		log.Println("error when getting user from cookie ", err)
 		return responseForbidden()
 	}
-
 	err = dbutil.UpdateProfile(profile, username)
 	if err != nil {
 		log.Println(dbutil.ErrorUpdateProfile + " " + err.Error())
