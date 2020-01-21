@@ -87,7 +87,9 @@ func handleAuthenticate(w http.ResponseWriter, r *http.Request) {
 		log.Println("sending login information failed:", err)
 		return
 	}
-	status = resp.GetMapper()[response.ResponseCode]
+	data := resp.GetMapper()
+	status = data[response.ResponseCode]
+
 	if status == authentication.ErrorNotAuthenticated || status == dbutil.ErrorGetPassword {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	} else {
@@ -102,7 +104,7 @@ func handleAuthenticate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getUserDataFromTCPServer(w http.ResponseWriter, r *http.Request, conn net.Conn) (user.User, error) {
+func getUserDataFromTCPServer(r *http.Request) (user.User, error) {
 	cookie, err := cookie.GetCookie(r)
 	if err != nil {
 		log.Println("error retrieving cookie: ", err)
@@ -135,9 +137,7 @@ func getUserFromDataInResponse(mapper map[string]string) user.User {
 }
 
 func showPage(w http.ResponseWriter, r *http.Request, pageName string) {
-	conn := connPool.Get()
-	defer connPool.Put(conn)
-	userData, err := getUserDataFromTCPServer(w, r, conn)
+	userData, err := getUserDataFromTCPServer(r)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
@@ -182,8 +182,6 @@ func handleChangeNickname(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleChangeProfile(w http.ResponseWriter, r *http.Request) {
-	conn := connPool.Get()
-
 	cookie, err := r.Cookie(user.CodeSessionID)
 	if err != nil {
 		log.Println("error getting cookie", err)
@@ -203,11 +201,6 @@ func handleChangeProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = readResponse(w, r, resp)
-	if err != nil {
-		connPool.CreateNewConnection()
-		return
-	}
-	connPool.Put(conn)
 }
 
 func main() {
@@ -226,7 +219,8 @@ func main() {
 	//	log.Println("error creating connection pool", err)
 	//}
 	//log.Println("done generating connections")
-	conn, err := grpc.Dial(":8081")
+
+	conn, err := grpc.Dial(":8081", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalln("error dialing grpc: ", err)
 	}
