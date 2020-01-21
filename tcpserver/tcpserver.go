@@ -231,15 +231,15 @@ func main() {
 		log.Println("error found in listening: ", err)
 	}
 
+	dbutil.PrepareDB(configDB)
+	defer dbutil.CloseDB()
+	dbutil.PrepareStatements()
+
 	grpcServer := grpc.NewServer()
 	pb.RegisterUserDataServiceServer(grpcServer, &server{})
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
-
-	dbutil.PrepareDB(configDB)
-	defer dbutil.CloseDB()
-	dbutil.PrepareStatements()
 
 	for {
 		connection, err := listener.Accept()
