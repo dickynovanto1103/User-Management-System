@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/gob"
 	"errors"
+	"google.golang.org/grpc"
 	"html/template"
 	"log"
 	"net"
@@ -19,12 +20,14 @@ import (
 	"github.com/dickynovanto1103/User-Management-System/internal/response"
 
 	"github.com/dickynovanto1103/User-Management-System/internal/user"
+	pb "github.com/dickynovanto1103/User-Management-System/proto"
 )
 
 const CodeForbidden = "Forbidden"
 
 var connPool = &connection.ConnPool{}
 var templates = template.Must(template.ParseGlob("templates/*"))
+var client pb.UserDataServiceClient
 
 func sendRequest(conn net.Conn, encoder *gob.Encoder, requestID int, mapper map[string]interface{}) error {
 	req := request.Request{RequestID: requestID, Data: mapper}
@@ -244,12 +247,19 @@ func main() {
 	http.HandleFunc("/changenickname", handleChangeNickname)
 	http.HandleFunc("/changeprofile", handleChangeProfile)
 
-	log.Println("start generating connections")
-	err := connPool.CreatePool(connection.MaxConnections)
+	//log.Println("start generating connections")
+	//err := connPool.CreatePool(connection.MaxConnections)
+	//if err != nil {
+	//	log.Println("error creating connection pool", err)
+	//}
+	//log.Println("done generating connections")
+	conn, err := grpc.Dial(":8081")
 	if err != nil {
-		log.Println("error creating connection pool", err)
+		log.Fatalln("error dialing grpc: ", err)
 	}
-	log.Println("done generating connections")
+	defer conn.Close()
+
+	client = pb.NewUserDataServiceClient(conn)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
