@@ -34,24 +34,36 @@ type server struct {
 }
 
 func (s *server) SendRequest(ctx context.Context, in *pb.Request) (*pb.Response, error) {
-	return nil,nil
+	requestID := in.GetRequestID()
+	mapper := in.GetMapper()
+	response := handleRequest(requestID, mapper)
+	newResponse := &pb.Response{
+		ResponseID:           int32(response.ResponseID),
+		Mapper:               response.Data,
+		XXX_NoUnkeyedLiteral: struct{}{},
+		XXX_unrecognized:     nil,
+		XXX_sizecache:        0,
+	}
+	return newResponse, nil
 }
 
-func handleAuthentication(conn net.Conn, req request.Request) {
-	username := req.Data[user.CodeUsername].(string)
-	password := req.Data[user.CodePassword].(string)
+func handleAuthentication(mapper map[string]string) response.Response {
+	username := mapper[user.CodeUsername]
+	password := mapper[user.CodePassword]
 	err := authentication.Authenticate(&username, &password)
+	mapperResp := make(map[string]string)
 	if err != nil {
 		if err.Error() == authentication.ErrorNotAuthenticated {
-			conn.Write([]byte(authentication.ErrorNotAuthenticated + "\n"))
+			mapperResp[response.ResponseCode] = authentication.ErrorNotAuthenticated
 		} else {
-			conn.Write([]byte(err.Error() + "\n"))
+			mapperResp[response.ResponseCode] = err.Error()
 		}
 	} else {
 		sessionID := stringutil.CreateRandomString(32)
 		redisutil.Set(sessionID, username, 5*time.Hour)
-		conn.Write([]byte(sessionID + "\n"))
+		mapperResp[response.ResponseCode] = sessionID
 	}
+	return response.Response{ResponseID: response.ResponseOK, Data: mapperResp}
 }
 
 func getUserDataFromCache(username string) (user.User, error) {
@@ -93,125 +105,99 @@ func getUserData(username string) (user.User, error) {
 	return data, err
 }
 
-func responseForbidden(conn net.Conn) {
-	encoder := gob.NewEncoder(conn)
-	var mapper = make(map[string]interface{})
-	mapper[response.ResponseCode] = response.ResponseKeyForbidden
-	resp := response.Response{ResponseID: response.ResponseForbidden, Data: mapper}
-	err := encoder.Encode(resp)
-	if err != nil {
-		log.Println("error in encoding response: ", err)
-	}
-	log.Println("handle info response: ", resp)
+func getMapFromUser(data user.User) map[string]string {
+	var mapper = make(map[string]string)
+	mapper[user.CodeUsername] = data.Username
+	mapper[user.CodeNickname] = data.Nickname
+	mapper[user.CodeProfile] = data.ProfileURL
+	return mapper
 }
 
-func responseUser(conn net.Conn, data user.User) {
-	encoder := gob.NewEncoder(conn)
-	var mapper = make(map[string]interface{})
-	mapper[user.CodeUser] = data
-	resp := response.Response{ResponseID: response.ResponseOK, Data: mapper}
-	err := encoder.Encode(resp)
-	log.Println("handle info response: ", resp)
-	if err != nil {
-		log.Println("error in encoding response: ", err)
-	}
-}
-
-func handleInfo(conn net.Conn, req request.Request) {
-	cookie := req.Data[user.CodeCookie].(http.Cookie)
-	username, err := redisutil.Get(cookie.Value)
+func handleInfo(mapper map[string]string) response.Response {
+	userIDFromCookie := mapper[user.CodeCookie]
+	username, err := redisutil.Get(userIDFromCookie)
 	if err != nil {
 		log.Println("error retrieving user data from cookie by redis: ", err)
-		responseForbidden(conn)
-		return
+		return responseForbidden()
 	}
 	data, err := getUserData(username)
 	if err != nil {
 		log.Println("fail to get user data", err)
-		responseForbidden(conn)
+		return responseForbidden()
 	} else {
-		responseUser(conn, data)
+		return responseUser(data)
 	}
 
 }
 
-func sendResponseBack(conn net.Conn, username string, err error) {
+func sendResponseBack(username string, err error) response.Response {
 	if err != nil {
 		log.Println("error update statement", err)
-		responseForbidden(conn)
+		return responseForbidden()
 	} else {
 		data, err := getUserData(username)
 		if err != nil {
 			log.Println("error getting user data from database: ", err)
-			return
+			return responseForbidden()
 		}
-		responseUser(conn, data)
+		return responseUser(data)
 	}
 }
 
-func handleUpdateNickname(conn net.Conn, req request.Request) {
-	nickname := req.Data[user.CodeNickname].(string)
-	cookie := req.Data[user.CodeCookie].(http.Cookie)
-	username, err := redisutil.Get(cookie.Value)
+func handleUpdateNickname(mapper map[string]string) response.Response {
+	nickname := mapper[user.CodeNickname]
+	cookieValue := mapper[user.CodeCookie]
+	username, err := redisutil.Get(cookieValue)
 
 	if err != nil {
 		log.Println("error when getting user from cookie ", err)
-		responseForbidden(conn)
-		return
+		return responseForbidden()
 	}
 
 	err = dbutil.UpdateNickname(nickname, username)
 	if err != nil {
 		log.Println(dbutil.ErrorUpdateProfile + " " + err.Error())
-		return
+		return responseError(err)
 	}
 	user, err := dbutil.GetUser(username)
 	setUserDataCache(user)
 
-	sendResponseBack(conn, username, err)
+	return sendResponseBack(username, err)
 }
 
-func handleUpdateProfile(conn net.Conn, req request.Request) {
-	profile := req.Data[user.CodeProfile].(string)
-	cookie := req.Data[user.CodeCookie].(http.Cookie)
-	username, err := redisutil.Get(cookie.Value)
+func handleUpdateProfile(mapper map[string]string) response.Response{
+	profile := mapper[user.CodeProfile]
+	userIDFromCookie := mapper[user.CodeCookie]
+	username, err := redisutil.Get(userIDFromCookie)
 
 	if err != nil {
 		log.Println("error when getting user from cookie ", err)
-		responseForbidden(conn)
-		return
+		return responseForbidden()
 	}
 
 	err = dbutil.UpdateProfile(profile, username)
 	if err != nil {
 		log.Println(dbutil.ErrorUpdateProfile + " " + err.Error())
-		return
+		return responseError(err)
 	}
 	user, err := dbutil.GetUser(username)
 	setUserDataCache(user)
 
-	sendResponseBack(conn, username, err)
+	return sendResponseBack(username, err)
 }
 
-func handleConnection(conn net.Conn) {
-	for {
-		decoder := gob.NewDecoder(conn)
-		var req request.Request
-		err := decoder.Decode(&req)
-		if err != nil {
-			log.Println("error in decoding in handling connection", err)
-			break
-		}
-		if req.RequestID == request.RequestLogin {
-			handleAuthentication(conn, req)
-		} else if req.RequestID == request.RequestUserInfo {
-			handleInfo(conn, req)
-		} else if req.RequestID == request.RequestUpdateNickname {
-			handleUpdateNickname(conn, req)
-		} else if req.RequestID == request.RequestUpdateProfile {
-			handleUpdateProfile(conn, req)
-		}
+func handleRequest(requestID int32, mapper map[string]string) response.Response {
+	if requestID == request.RequestLogin {
+		return handleAuthentication(mapper)
+	} else if requestID == request.RequestUserInfo {
+		return handleInfo(mapper)
+	} else if requestID == request.RequestUpdateNickname {
+		return handleUpdateNickname(mapper)
+	} else if requestID == request.RequestUpdateProfile {
+		return handleUpdateProfile(mapper)
 	}
+	//should never reach this
+	return response.Response{}
 }
 
 func main() {
@@ -239,14 +225,5 @@ func main() {
 	pb.RegisterUserDataServiceServer(grpcServer, &server{})
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %v", err)
-	}
-
-	for {
-		connection, err := listener.Accept()
-		if err != nil {
-			log.Println("error found in accepting connection: ", err)
-			continue
-		}
-		go handleConnection(connection)
 	}
 }
