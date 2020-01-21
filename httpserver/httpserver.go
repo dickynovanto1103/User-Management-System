@@ -68,6 +68,14 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleRegister(w http.ResponseWriter, r *http.Request) {
+	err := templates.ExecuteTemplate(w, "register.html", nil)
+	if err != nil {
+		log.Println("error in executing template register", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func sendLoginInformation(r *http.Request, conn net.Conn) (*pb.Response, error) {
 	username := r.FormValue(user.CodeUsername)
 	password := r.FormValue(user.CodePassword)
@@ -102,6 +110,13 @@ func handleAuthenticate(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
+}
+
+func handleRegisterAuth(w http.ResponseWriter, r *http.Request) {
+	username := r.FormValue("username")
+	nickname := r.FormValue("nickname")
+	password := r.FormValue("password")
+	log.Println(username, nickname, password)
 }
 
 func getUserDataFromTCPServer(r *http.Request) (user.User, error) {
@@ -204,21 +219,7 @@ func handleChangeProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/login/", handleLogin)
-	http.HandleFunc("/authenticate", handleAuthenticate)
-	http.HandleFunc("/info/", handleInfo)
-
-	http.HandleFunc("/editnickname/", handleEditNickname)
-	http.HandleFunc("/editprofile/", handleEditProfile)
-	http.HandleFunc("/changenickname", handleChangeNickname)
-	http.HandleFunc("/changeprofile", handleChangeProfile)
-
-	//log.Println("start generating connections")
-	//err := connPool.CreatePool(connection.MaxConnections)
-	//if err != nil {
-	//	log.Println("error creating connection pool", err)
-	//}
-	//log.Println("done generating connections")
+	handleRouting()
 
 	conn, err := grpc.Dial(":8081", grpc.WithInsecure())
 	if err != nil {
