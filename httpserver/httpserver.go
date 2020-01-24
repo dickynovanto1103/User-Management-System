@@ -186,12 +186,10 @@ func handleChangeNickname(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := sendRequest(request.RequestUpdateNickname, mapper)
 	if err != nil {
-		connPool.CreateNewConnection()
 		return
 	}
 	err = readResponse(w, r, resp)
 	if err != nil {
-		connPool.CreateNewConnection()
 		return
 	}
 }
@@ -212,7 +210,6 @@ func handleChangeProfile(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := sendRequest(request.RequestUpdateProfile, mapper)
 	if err != nil {
-		connPool.CreateNewConnection()
 		return
 	}
 	err = readResponse(w, r, resp)
