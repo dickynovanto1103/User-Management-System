@@ -202,10 +202,6 @@ func handleConnection(conn net.Conn) {
 }
 
 func main() {
-	gob.Register(user.User{})
-	gob.Register(http.Cookie{})
-	gob.Register(response.Response{})
-
 	configDB := config.LoadConfigDB("config/configDB.json")
 	configRedis := config.LoadConfigRedis("config/configRedis.json")
 
