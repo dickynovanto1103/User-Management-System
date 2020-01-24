@@ -1,13 +1,15 @@
 package response
 
 type Response struct {
-	ResponseID int
-	Data       map[string]interface{}
+	ResponseID int32
+	Data       map[string]string
 }
 
 const (
 	ResponseOK           = 1
 	ResponseForbidden    = 2
+	ResponseError        = 3
 	ResponseCode         = "response"
 	ResponseKeyForbidden = "Forbidden"
+	ResponseKeyError     = "Error"
 )

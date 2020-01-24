@@ -1,9 +1,9 @@
 package main
 
 import (
-	"bufio"
-	"encoding/gob"
+	"context"
 	"errors"
+	"google.golang.org/grpc"
 	"html/template"
 	"log"
 	"net"
@@ -19,33 +19,38 @@ import (
 	"github.com/dickynovanto1103/User-Management-System/internal/response"
 
 	"github.com/dickynovanto1103/User-Management-System/internal/user"
+	pb "github.com/dickynovanto1103/User-Management-System/proto"
 )
 
 const CodeForbidden = "Forbidden"
 
 var connPool = &connection.ConnPool{}
 var templates = template.Must(template.ParseGlob("templates/*"))
+var client pb.UserDataServiceClient
 
-func sendRequest(conn net.Conn, encoder *gob.Encoder, requestID int, mapper map[string]interface{}) error {
-	req := request.Request{RequestID: requestID, Data: mapper}
-	err := encoder.Encode(req)
-	if err != nil {
-		log.Println("encoding error here: ", err)
-		return err
+func sendRequest(requestID int, mapper map[string]string) (*pb.Response, error) {
+	request := &pb.Request{
+		RequestID:            int32(requestID),
+		Mapper:               mapper,
+		XXX_NoUnkeyedLiteral: struct{}{},
+		XXX_unrecognized:     nil,
+		XXX_sizecache:        0,
 	}
-	return nil
+	response, err := client.SendRequest(context.Background(), request)
+	return response, err
 }
 
-func readResponse(w http.ResponseWriter, r *http.Request, conn net.Conn) error {
-	var resp response.Response
-	decoder := gob.NewDecoder(conn)
-	err := decoder.Decode(&resp)
-	if err != nil {
-		log.Println("error in decoding: ", err)
-		return err
+func convertRequestPBToRequestStructure(resp *pb.Response) response.Response {
+	response := response.Response{
+		ResponseID: resp.GetResponseID(),
+		Data:       resp.GetMapper(),
 	}
+	return response
+}
 
-	if resp.ResponseID == response.ResponseForbidden {
+func readResponse(w http.ResponseWriter, r *http.Request, responsePB *pb.Response) error {
+	resp := convertRequestPBToRequestStructure(responsePB)
+	if resp.ResponseID == response.ResponseForbidden || resp.ResponseID == response.ResponseError {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	} else {
 		userData := resp.Data[user.CodeUser]
@@ -71,51 +76,28 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func sendLoginInformation(r *http.Request, conn net.Conn) error {
+func sendLoginInformation(r *http.Request, conn net.Conn) (*pb.Response, error) {
 	username := r.FormValue(user.CodeUsername)
 	password := r.FormValue(user.CodePassword)
-	encoder := gob.NewEncoder(conn)
 
-	var mapper = make(map[string]interface{})
+	var mapper = make(map[string]string)
 	mapper[user.CodeUsername] = username
 	mapper[user.CodePassword] = password
-	err := sendRequest(conn, encoder, request.RequestLogin, mapper)
-	return err
+	resp, err := sendRequest(request.RequestLogin, mapper)
+	return resp, err
 }
 
 func handleAuthenticate(w http.ResponseWriter, r *http.Request) {
 	var conn net.Conn
 	var status string
-	finallySuccess := false
-	for i := 0; i < request.MaxTries; i++ {
-		conn = connPool.Get()
-
-		err := sendLoginInformation(r, conn)
-		if err != nil {
-			log.Println("sending login information failed:", err)
-			return
-		}
-		status, err = bufio.NewReader(conn).ReadString('\n')
-
-		if err != nil {
-			log.Println("error", err)
-			connPool.CreateNewConnection()
-			conn = connPool.Get()
-		} else {
-			finallySuccess = true
-			break
-		}
-	}
-	if !finallySuccess {
-		log.Println("error not finallySuccess")
-		http.Error(w, "error", http.StatusInternalServerError)
-		connPool.CreateNewConnection()
+	resp, err := sendLoginInformation(r, conn)
+	if err != nil {
+		log.Println("sending login information failed:", err)
 		return
 	}
+	data := resp.GetMapper()
+	status = data[response.ResponseCode]
 
-	defer connPool.Put(conn)
-
-	status = status[:len(status)-1] //to ignore last \n
 	if status == authentication.ErrorNotAuthenticated || status == dbutil.ErrorGetPassword {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	} else {
@@ -137,37 +119,40 @@ func handleRegisterAuth(w http.ResponseWriter, r *http.Request) {
 	log.Println(username, nickname, password)
 }
 
-func getUserDataFromTCPServer(w http.ResponseWriter, r *http.Request, conn net.Conn) (user.User, error) {
+func getUserDataFromTCPServer(r *http.Request) (user.User, error) {
 	cookie, err := cookie.GetCookie(r)
 	if err != nil {
 		log.Println("error retrieving cookie: ", err)
 		return user.User{}, err
 	}
-	encoder := gob.NewEncoder(conn)
-	var mapper = make(map[string]interface{})
-	mapper[user.CodeCookie] = cookie
-	sendRequest(conn, encoder, request.RequestUserInfo, mapper)
+	var mapper = make(map[string]string)
+	mapper[user.CodeCookie] = cookie.Value
+	resp, err := sendRequest(request.RequestUserInfo, mapper)
 
-	var resp response.Response
-	decoder := gob.NewDecoder(conn)
-	err = decoder.Decode(&resp)
 	if err != nil {
-		log.Println("error in decoding: ", err)
+		log.Println("error in receiving response: ", err)
 		return user.User{}, errors.New(response.ResponseKeyForbidden)
 	}
 
 	if resp.ResponseID == response.ResponseForbidden {
 		return user.User{}, errors.New(CodeForbidden)
 	} else {
-		userData := resp.Data[user.CodeUser]
-		return userData.(user.User), nil
+		userData := getUserFromDataInResponse(resp.GetMapper())
+		return userData, nil
 	}
 }
 
+func getUserFromDataInResponse(mapper map[string]string) user.User {
+	var userResult user.User
+	userResult.Username = mapper[user.CodeUsername]
+	userResult.Nickname = mapper[user.CodeNickname]
+	userResult.ProfileURL = mapper[user.CodeProfile]
+
+	return userResult
+}
+
 func showPage(w http.ResponseWriter, r *http.Request, pageName string) {
-	conn := connPool.Get()
-	defer connPool.Put(conn)
-	userData, err := getUserDataFromTCPServer(w, r, conn)
+	userData, err := getUserDataFromTCPServer(r)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
@@ -188,37 +173,30 @@ func handleInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleChangeNickname(w http.ResponseWriter, r *http.Request) {
-	conn := connPool.Get()
-
 	nickname := r.FormValue(user.CodeNickname)
 
-	encoder := gob.NewEncoder(conn)
-
-	var mapper = make(map[string]interface{})
+	var mapper = make(map[string]string)
 	cookie, err := cookie.GetCookie(r)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
 	mapper[user.CodeNickname] = nickname
-	mapper[user.CodeCookie] = cookie
+	mapper[user.CodeCookie] = cookie.Value
 
-	err = sendRequest(conn, encoder, request.RequestUpdateNickname, mapper)
+	resp, err := sendRequest(request.RequestUpdateNickname, mapper)
 	if err != nil {
 		connPool.CreateNewConnection()
 		return
 	}
-	err = readResponse(w, r, conn)
+	err = readResponse(w, r, resp)
 	if err != nil {
 		connPool.CreateNewConnection()
 		return
 	}
-	connPool.Put(conn)
 }
 
 func handleChangeProfile(w http.ResponseWriter, r *http.Request) {
-	conn := connPool.Get()
-
 	cookie, err := r.Cookie(user.CodeSessionID)
 	if err != nil {
 		log.Println("error getting cookie", err)
@@ -227,38 +205,29 @@ func handleChangeProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filename, err := fileuploader.UploadFile(r, user.CodeProfile, cookie.Value)
-	encoder := gob.NewEncoder(conn)
 
-	var mapper = make(map[string]interface{})
+	var mapper = make(map[string]string)
 	mapper[user.CodeProfile] = filename
-	mapper[user.CodeCookie] = cookie
+	mapper[user.CodeCookie] = cookie.Value
 
-	err = sendRequest(conn, encoder, request.RequestUpdateProfile, mapper)
+	resp, err := sendRequest(request.RequestUpdateProfile, mapper)
 	if err != nil {
 		connPool.CreateNewConnection()
 		return
 	}
-	err = readResponse(w, r, conn)
-	if err != nil {
-		connPool.CreateNewConnection()
-		return
-	}
-	connPool.Put(conn)
+	err = readResponse(w, r, resp)
 }
 
 func main() {
-	gob.Register(user.User{})
-	gob.Register(request.Request{})
-	gob.Register(http.Cookie{})
-
 	handleRouting()
 
-	log.Println("start generating connections")
-	err := connPool.CreatePool(connection.MaxConnections)
+	conn, err := grpc.Dial(":8081", grpc.WithInsecure())
 	if err != nil {
-		log.Println("error creating connection pool", err)
+		log.Fatalln("error dialing grpc: ", err)
 	}
-	log.Println("done generating connections")
+	defer conn.Close()
+
+	client = pb.NewUserDataServiceClient(conn)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

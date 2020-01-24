@@ -2,7 +2,7 @@ package request
 
 type Request struct {
 	RequestID int
-	Data      map[string]interface{}
+	Data      map[string]string
 }
 
 const (

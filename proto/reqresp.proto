@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package proto;
+
+service UserDataService {
+    rpc SendRequest(Request) returns (Response) {}
+}
+
+message Request {
+    int32 RequestID = 1;
+    map<string, string> mapper = 2;
+}
+
+message Response {
+    int32 ResponseID = 1;
+    map<string, string> mapper = 2;
+}
