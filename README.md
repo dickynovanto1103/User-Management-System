@@ -10,7 +10,7 @@
     - `PATH`: `export PATH=$PATH:$(go env GOPATH)/bin`
 2. Install text editor / IDE (I chose Visual Studio Code) + golint
 3. Install MySQL server
-4. Install Redis (in mac: `brew install redis`)
+4. Install Redis: create new Redis container by `docker-compose up -d`
 5. Generate 10 millions of user data and insert all the data into table (see section III)
 6. For generating the user data, python script is used. 
     - Hash algorithm for password: pbkdf2.
