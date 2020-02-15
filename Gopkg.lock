@@ -2,7 +2,7 @@
 
 
 [[projects]]
-  digest = "1:b46f50677ef33284ebde2b285a42b707ff9e1de1f37328d91869859c929ebbd2"
+  digest = "1:e17320223c7c866dfbec405efe8abc8e383ccad131fb76ca7ff70580dafb9067"
   name = "github.com/go-redis/redis"
   packages = [
     ".",
@@ -14,19 +14,19 @@
     "internal/util",
   ]
   pruneopts = "UT"
-  revision = "7f69d5e32072d151eb6936cbe2306413e8117488"
-  version = "v6.15.6"
+  revision = "99cd690a7019656b0b67c6664453f27a6d8a658e"
+  version = "v6.15.7"
 
 [[projects]]
-  digest = "1:ec6f9bf5e274c833c911923c9193867f3f18788c461f76f05f62bb1510e0ae65"
+  digest = "1:a3af33fd30536d9c5a7b6ad542390919e57c1125097a194c7b3d9904109a0611"
   name = "github.com/go-sql-driver/mysql"
   packages = ["."]
   pruneopts = "UT"
-  revision = "72cd26f257d44c1114970e19afddcd812016007e"
-  version = "v1.4.1"
+  revision = "17ef3dd9d98b69acec3e85878995ada9533a9370"
+  version = "v1.5.0"
 
 [[projects]]
-  digest = "1:f5ce1529abc1204444ec73779f44f94e2fa8fcdb7aca3c355b0c95947e4005c6"
+  digest = "1:0314772c6631bb25d46f0b6a46bed7145e359cbb7411db99682a3b0d1d0cd00f"
   name = "github.com/golang/protobuf"
   packages = [
     "proto",
@@ -36,8 +36,8 @@
     "ptypes/timestamp",
   ]
   pruneopts = "UT"
-  revision = "6c65a5562fc06764971b7c5d05c76c75e84bdbf7"
-  version = "v1.3.2"
+  revision = "d23c5127dc24889085f8ccea5c9d560a57a879d8"
+  version = "v1.3.3"
 
 [[projects]]
   digest = "1:85af92fe0f90252a135ce4a3115abec6347d9c5e6470e374df67113ac8a0e257"
@@ -53,7 +53,7 @@
   name = "golang.org/x/crypto"
   packages = ["pbkdf2"]
   pruneopts = "UT"
-  revision = "e9b2fee46413994441b28dfca259d911d963dfed"
+  revision = "1d94cc7ab1c630336ab82ccb9c9cda72a875c382"
 
 [[projects]]
   branch = "master"
@@ -68,15 +68,15 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "6afb5195e5aab057fda82e27171243402346b0ad"
+  revision = "16171245cfb220d5317888b716d69c1fb4e7992b"
 
 [[projects]]
   branch = "master"
-  digest = "1:e13350b7207ecc34977340d53522e0335dd36ed86ca7c346a36d2e88eb0fadfc"
+  digest = "1:21170ea1a15ba3b4e49dd934e130f4e21edf3c117e24f07502fe46e45ff3a8fc"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "86b910548bc16777f40503131aa424ae0a092199"
+  revision = "12a6c2dcc1e4cb348b57847c73987099e261714b"
 
 [[projects]]
   digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
@@ -104,23 +104,15 @@
   version = "v0.3.2"
 
 [[projects]]
-  digest = "1:c25289f43ac4a68d88b02245742347c94f1e108c534dda442188015ff80669b3"
-  name = "google.golang.org/appengine"
-  packages = ["cloudsql"]
-  pruneopts = "UT"
-  revision = "971852bfffca25b069c31162ae8f247a3dba083b"
-  version = "v1.6.5"
-
-[[projects]]
   branch = "master"
-  digest = "1:583a0c80f5e3a9343d33aea4aead1e1afcc0043db66fdf961ddd1fe8cd3a4faf"
+  digest = "1:0c679e19d1865dd65e7ec400bf9562d8f161cf59c4f74c0bb50f365fc9fb19eb"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "e1de0a7b01eb2fc11d735e4bfb79d2e53ec9edb3"
+  revision = "66ed5ce911ce4978d229e861f15b63d8bf359acb"
 
 [[projects]]
-  digest = "1:3fe55026bb11519b45c0fc9d848fd779028b868dc62f5563c518cf850c7421d5"
+  digest = "1:de21a2d5b9c8697d83f5ab48f3e8fe3616c33ac4b2d057083662dede0e81488e"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -161,8 +153,8 @@
     "tap",
   ]
   pruneopts = "UT"
-  revision = "f5b0812e6fe574d90da76b205e9eb51f6ddb1919"
-  version = "v1.26.0"
+  revision = "f495f5b15ae7ccda3b38c53a1bfcde4c1a58a2bc"
+  version = "v1.27.1"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -171,7 +163,6 @@
     "github.com/go-redis/redis",
     "github.com/go-sql-driver/mysql",
     "github.com/golang/protobuf/proto",
-    "github.com/golang/protobuf/ptypes/any",
     "github.com/pkg/profile",
     "golang.org/x/crypto/pbkdf2",
     "google.golang.org/grpc",
