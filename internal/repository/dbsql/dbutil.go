@@ -1,8 +1,7 @@
-package sql
+package dbsql
 
 import (
 	"database/sql"
-	"github.com/dickynovanto1103/User-Management-System/internal/model"
 	"log"
 
 	"github.com/dickynovanto1103/User-Management-System/internal/service/config"
@@ -22,6 +21,12 @@ func PrepareDB(config config.ConfigDB) (*sql.DB, error) {
 	db.SetMaxOpenConns(MaxConnections)
 	db.SetMaxIdleConns(MaxIdleConnections)
 	return db, nil
+}
+
+func NewDBImpl(db *sql.DB) *DBImpl {
+	return &DBImpl{
+		db: db,
+	}
 }
 
 func (impl *DBImpl) CloseDB() {
@@ -62,33 +67,4 @@ func (impl *DBImpl) PrepareQueryPassword() (*sql.Stmt, error) {
 		return nil, err
 	}
 	return statementQueryPassword, nil
-}
-
-func GetPassword(username string) (string, error) {
-	var pass string
-	err := statementQueryPassword.QueryRow(username).Scan(&pass)
-	return pass, err
-}
-
-func GetUser(username string) (model.User, error) {
-	var data model.User
-	err := statementQueryUser.QueryRow(username).Scan(&data.Username, &data.Password, &data.Nickname, &data.ProfileURL)
-	return data, err
-}
-
-func UpdateNickname(nickname string, username string) error {
-	_, err := statementUpdateNickname.Exec(nickname, username)
-	return err
-}
-
-func UpdateProfile(profile string, username string) error {
-	_, err := statementUpdateProfile.Exec(profile, username)
-	return err
-}
-
-func PrepareStatements() {
-	prepareQueryUser()
-	prepareUpdateNickname()
-	prepareUpdateProfile()
-	prepareQueryPassword()
 }

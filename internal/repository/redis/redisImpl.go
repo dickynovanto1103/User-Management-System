@@ -9,27 +9,37 @@ import (
 	"github.com/go-redis/redis"
 )
 
-type Redis struct {
-
+type RedisImpl struct {
+	redisClient *redis.Client
 }
 
-var redisClient *redis.Client
-
-func CreateRedisClient(config config.ConfigRedis) {
-	redisClient = redis.NewClient(&redis.Options{
+func CreateRedisClient(config config.ConfigRedis) *redis.Client {
+	redisClient := redis.NewClient(&redis.Options{
 		Addr:     config.Addr,
 		Password: config.Password,
 		DB:       config.DB,
 	})
+
 	pong, err := redisClient.Ping().Result()
 	log.Println(pong, err)
+	if err != nil {
+		return nil
+	}
+
+	return redisClient
 }
 
-func Set(key string, value string, duration time.Duration) {
-	redisClient.Set(key, value, duration)
+func CreateRedisWrapper(redisClient *redis.Client) *RedisImpl {
+	return &RedisImpl{
+		redisClient: redisClient,
+	}
 }
 
-func Get(key string) (string, error) {
-	result, err := redisClient.Get(key).Result()
+func (r *RedisImpl) Set(key string, value string, duration time.Duration) {
+	r.redisClient.Set(key, value, duration)
+}
+
+func (r *RedisImpl) Get(key string) (string, error) {
+	result, err := r.redisClient.Get(key).Result()
 	return result, err
 }
