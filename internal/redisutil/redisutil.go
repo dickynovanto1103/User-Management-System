@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/dickynovanto1103/User-Management-System/internal/config"
+	"github.com/dickynovanto1103/User-Management-System/internal/service/config"
 
 	"github.com/go-redis/redis"
 )

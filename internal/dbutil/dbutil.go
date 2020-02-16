@@ -2,10 +2,10 @@ package dbutil
 
 import (
 	"database/sql"
+	"github.com/dickynovanto1103/User-Management-System/internal/model"
 	"log"
 
-	"github.com/dickynovanto1103/User-Management-System/internal/config"
-	"github.com/dickynovanto1103/User-Management-System/internal/user"
+	"github.com/dickynovanto1103/User-Management-System/internal/service/config"
 )
 
 var db *sql.DB
@@ -16,9 +16,9 @@ const (
 	MaxIdleConnections  = 100
 	tableName           = "User"
 	ErrorGetPassword    = "ErrorGetPassword"
+	ErrorUpdateProfile  = "ErrorUpdateProfile"
 	ErrorGetUser        = "ErrorGetUser"
 	ErrorUpdateNickname = "ErrorUpdateNickname"
-	ErrorUpdateProfile  = "ErrorUpdateProfile"
 )
 
 func PrepareDB(config config.ConfigDB) {
@@ -74,8 +74,8 @@ func GetPassword(username string) (string, error) {
 	return pass, err
 }
 
-func GetUser(username string) (user.User, error) {
-	var data user.User
+func GetUser(username string) (model.User, error) {
+	var data model.User
 	err := statementQueryUser.QueryRow(username).Scan(&data.Username, &data.Password, &data.Nickname, &data.ProfileURL)
 	return data, err
 }

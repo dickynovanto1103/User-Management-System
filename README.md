@@ -50,7 +50,7 @@
 3. Run HTTP server with command: `web`
 
 ## How to run performance test
-1. Go to test directory, open terminal
+1. Go to scripts directory, open terminal
 2. Enter this command: `wrk -t100 -c1000 -d10s -s post.lua http://localhost:8080/authenticate `
     - WRK will be running with the number of thread = 100, the number of keep-alive connection = 1000, duration = 10 seconds and running script post.lua that exist inside the directory, and the endpoint that is tested is http://localhost:8080/authenticate
 3. The result provides many information about the performance test, for example the number of request per second.
