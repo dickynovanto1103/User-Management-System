@@ -1,4 +1,4 @@
-package redisutil
+package redis
 
 import (
 	"log"
@@ -8,6 +8,10 @@ import (
 
 	"github.com/go-redis/redis"
 )
+
+type Redis struct {
+
+}
 
 var redisClient *redis.Client
 

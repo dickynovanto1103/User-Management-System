@@ -1,4 +1,4 @@
-package dbutil
+package sql
 
 import (
 	"database/sql"
@@ -8,64 +8,60 @@ import (
 	"github.com/dickynovanto1103/User-Management-System/internal/service/config"
 )
 
-var db *sql.DB
-var statementQueryUser, statementUpdateNickname, statementUpdateProfile, statementQueryPassword *sql.Stmt
+type DBImpl struct {
+	db *sql.DB
+}
 
-const (
-	MaxConnections      = 100
-	MaxIdleConnections  = 100
-	tableName           = "User"
-	ErrorGetPassword    = "ErrorGetPassword"
-	ErrorUpdateProfile  = "ErrorUpdateProfile"
-	ErrorGetUser        = "ErrorGetUser"
-	ErrorUpdateNickname = "ErrorUpdateNickname"
-)
-
-func PrepareDB(config config.ConfigDB) {
-	var err error
-	db, err = sql.Open(config.DriverName, config.Username+":"+config.Password+"@/"+config.DBName)
+func PrepareDB(config config.ConfigDB) (*sql.DB, error) {
+	db, err := sql.Open(config.DriverName, config.Username+":"+config.Password+"@/"+config.DBName)
 	if err != nil {
 		log.Println("error opening DB: ", err)
-		return
+		return nil, err
 	}
+
 	db.SetMaxOpenConns(MaxConnections)
 	db.SetMaxIdleConns(MaxIdleConnections)
+	return db, nil
 }
 
-func CloseDB() {
-	db.Close()
+func (impl *DBImpl) CloseDB() {
+	impl.db.Close()
 }
 
-func prepareQueryUser() {
-	var err error
-	statementQueryUser, err = db.Prepare("SELECT username, password, nickname, profileURL from " + tableName + " where username = ?")
+func (impl *DBImpl) PrepareQueryUser() (*sql.Stmt, error) {
+	statementQueryUser, err := impl.db.Prepare("SELECT username, password, nickname, profileURL from " + tableName + " where username = ?")
 	if err != nil {
 		log.Println("error preparing statement: ", err)
+		return nil, err
 	}
+	return statementQueryUser, nil
 }
 
-func prepareUpdateNickname() {
-	var err error
-	statementUpdateNickname, err = db.Prepare("UPDATE " + tableName + " SET nickname = ? WHERE username = ?")
+func (impl *DBImpl) PrepareUpdateNickname() (*sql.Stmt, error) {
+	statementUpdateNickname, err := impl.db.Prepare("UPDATE " + tableName + " SET nickname = ? WHERE username = ?")
 	if err != nil {
 		log.Println("error preparing statement: ", err)
+		return nil, err
 	}
+	return statementUpdateNickname, nil
 }
 
-func prepareUpdateProfile() {
-	var err error
-	statementUpdateProfile, err = db.Prepare("UPDATE " + tableName + " SET profileURL = ? WHERE username = ?")
+func (impl *DBImpl) PrepareUpdateProfile() (*sql.Stmt, error) {
+	statementUpdateProfile, err := impl.db.Prepare("UPDATE " + tableName + " SET profileURL = ? WHERE username = ?")
 	if err != nil {
 		log.Println("error preparing statement: ", err)
+		return nil, err
 	}
+	return statementUpdateProfile, nil
 }
 
-func prepareQueryPassword() {
-	var err error
-	statementQueryPassword, err = db.Prepare("SELECT password from " + tableName + " where username = ?")
+func (impl *DBImpl) PrepareQueryPassword() (*sql.Stmt, error) {
+	statementQueryPassword, err := impl.db.Prepare("SELECT password from " + tableName + " where username = ?")
 	if err != nil {
 		log.Println("error preparing statement: ", err)
+		return nil, err
 	}
+	return statementQueryPassword, nil
 }
 
 func GetPassword(username string) (string, error) {
