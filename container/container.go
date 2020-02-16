@@ -2,6 +2,7 @@ package container
 
 import (
 	"database/sql"
+
 	"github.com/dickynovanto1103/User-Management-System/internal/repository/dbsql"
 	"github.com/dickynovanto1103/User-Management-System/internal/repository/redis"
 	"github.com/dickynovanto1103/User-Management-System/internal/service/config"
@@ -17,7 +18,12 @@ func BuildHttpServerClient(conn *grpc.ClientConn) {
 
 var DBImpl *dbsql.DBImpl
 var RedisImpl *redis.RedisImpl
-var StatementQueryUser, StatementUpdateNickname, StatementUpdateProfile, StatementQueryPassword *sql.Stmt
+var (
+	StatementUpdateNickname *sql.Stmt
+	StatementUpdateProfile  *sql.Stmt
+	StatementQueryPassword  *sql.Stmt
+	StatementQueryUser      *sql.Stmt
+)
 
 func BuildTCPServerDep() {
 	configDB := config.LoadConfigDB("config/configDB.json")
