@@ -3,18 +3,19 @@ package httpServer
 import (
 	"context"
 	"errors"
-	"github.com/dickynovanto1103/User-Management-System/container"
-	"github.com/dickynovanto1103/User-Management-System/internal/dbutil"
-	"github.com/dickynovanto1103/User-Management-System/internal/model"
-	"github.com/dickynovanto1103/User-Management-System/internal/service/authentication"
-	"github.com/dickynovanto1103/User-Management-System/internal/service/cookie"
-	"github.com/dickynovanto1103/User-Management-System/internal/service/fileUploader"
-	pb "github.com/dickynovanto1103/User-Management-System/proto"
 	"html/template"
 	"log"
 	"net"
 	"net/http"
 	"time"
+
+	"github.com/dickynovanto1103/User-Management-System/container"
+	"github.com/dickynovanto1103/User-Management-System/internal/model"
+	"github.com/dickynovanto1103/User-Management-System/internal/repository/dbsql"
+	"github.com/dickynovanto1103/User-Management-System/internal/service/authentication"
+	"github.com/dickynovanto1103/User-Management-System/internal/service/cookie"
+	"github.com/dickynovanto1103/User-Management-System/internal/service/fileUploader"
+	pb "github.com/dickynovanto1103/User-Management-System/proto"
 )
 
 var templates = template.Must(template.ParseGlob("internal/service/httpServer/templates/*"))
@@ -46,7 +47,7 @@ func handleAuthenticate(w http.ResponseWriter, r *http.Request) {
 	data := resp.GetMapper()
 	status = data[model.ResponseCode]
 
-	if status == authentication.ErrorNotAuthenticated || status == dbutil.ErrorGetPassword {
+	if status == authentication.ErrorNotAuthenticated || status == dbsql.ErrorGetPassword {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	} else {
 		sessionID := status

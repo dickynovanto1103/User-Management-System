@@ -2,11 +2,12 @@ package authentication
 
 import (
 	"crypto/sha512"
-
 	"encoding/hex"
 	"errors"
 
-	"github.com/dickynovanto1103/User-Management-System/internal/dbutil"
+	"github.com/dickynovanto1103/User-Management-System/container"
+	"github.com/dickynovanto1103/User-Management-System/internal/repository/dbsql"
+
 	"golang.org/x/crypto/pbkdf2"
 )
 
@@ -23,9 +24,9 @@ func VerifyPassword(storedPassword string, inputPassword string) bool {
 }
 
 func Authenticate(username *string, password *string) error {
-	pass, err := dbutil.GetPassword(*username)
+	pass, err := getPassword(*username)
 	if err != nil {
-		return errors.New(dbutil.ErrorGetPassword)
+		return errors.New(dbsql.ErrorGetPassword)
 	}
 
 	if VerifyPassword(pass, *password) {
@@ -33,4 +34,10 @@ func Authenticate(username *string, password *string) error {
 	} else {
 		return errors.New(ErrorNotAuthenticated)
 	}
+}
+
+func getPassword(username string) (string, error) {
+	var pass string
+	err := container.StatementQueryPassword.QueryRow(username).Scan(&pass)
+	return pass, err
 }

@@ -1,6 +1,7 @@
 package tcpServer
 
 import (
+	"github.com/dickynovanto1103/User-Management-System/container"
 	"github.com/dickynovanto1103/User-Management-System/internal/model"
 	"github.com/dickynovanto1103/User-Management-System/internal/service/tcpServer/requestHandler"
 )
@@ -14,5 +15,5 @@ var mapperReqIdToCommand = map[int]requestHandler.RequestHandler{
 
 func HandleRequest(requestID int32, mapper map[string]string) model.Response {
 	command := mapperReqIdToCommand[int(requestID)]
-	return command.HandleRequest(mapper)
+	return command.HandleRequest(mapper, container.RedisImpl)
 }
