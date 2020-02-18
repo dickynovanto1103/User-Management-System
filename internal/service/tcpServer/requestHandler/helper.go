@@ -53,14 +53,15 @@ func sendResponseBack(username string, err error, redis redis.Redis) model.Respo
 	if err != nil {
 		log.Println("error update statement", err)
 		return responseHandler.ResponseForbidden()
-	} else {
-		data, err := getUserData(username, redis)
-		if err != nil {
-			log.Println("error getting user data from database: ", err)
-			return responseHandler.ResponseForbidden()
-		}
-		return responseHandler.ResponseUser(data)
 	}
+
+	data, err := getUserData(username, redis)
+	if err != nil {
+		log.Println("error getting user data from database: ", err)
+		return responseHandler.ResponseForbidden()
+	}
+
+	return responseHandler.ResponseUser(data)
 }
 
 func GetUser(username string) (model.User, error) {

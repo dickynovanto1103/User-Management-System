@@ -19,13 +19,15 @@ func (handler *AuthenticationHandler) HandleRequest(mapper map[string]string, re
 	if err != nil {
 		if err.Error() == authentication.ErrorNotAuthenticated {
 			mapperResp[model.ResponseCode] = authentication.ErrorNotAuthenticated
-		} else {
-			mapperResp[model.ResponseCode] = err.Error()
 		}
-	} else {
-		sessionID := stringutil.CreateRandomString(32)
-		redis.Set(sessionID, username, 5*time.Hour)
-		mapperResp[model.ResponseCode] = sessionID
+
+		mapperResp[model.ResponseCode] = err.Error()
+		return model.Response{ResponseID: model.ResponseOK, Data: mapperResp}
 	}
+
+	sessionID := stringutil.CreateRandomString(32)
+	redis.Set(sessionID, username, 5*time.Hour)
+	mapperResp[model.ResponseCode] = sessionID
+
 	return model.Response{ResponseID: model.ResponseOK, Data: mapperResp}
 }

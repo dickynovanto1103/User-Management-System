@@ -21,7 +21,7 @@ func (handler *InfoHandler) HandleRequest(mapper map[string]string, redis redis.
 	if err != nil {
 		log.Println("fail to get user data", err)
 		return responseHandler.ResponseForbidden()
-	} else {
-		return responseHandler.ResponseUser(data)
 	}
+
+	return responseHandler.ResponseUser(data)
 }

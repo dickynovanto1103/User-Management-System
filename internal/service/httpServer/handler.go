@@ -49,16 +49,19 @@ func handleAuthenticate(w http.ResponseWriter, r *http.Request) {
 
 	if status == authentication.ErrorNotAuthenticated || status == dbsql.ErrorGetPassword {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
-	} else {
-		sessionID := status
-		cookie.CreateCookie(w, sessionID, 5*time.Hour)
-		http.Redirect(w, r, "/info", http.StatusPermanentRedirect)
-		err := templates.ExecuteTemplate(w, "info.html", nil)
-		if err != nil {
-			log.Println("error executing template:", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		return
 	}
+
+	sessionID := status
+	cookie.CreateCookie(w, sessionID, 5*time.Hour)
+	http.Redirect(w, r, "/info", http.StatusPermanentRedirect)
+
+	err = templates.ExecuteTemplate(w, "info.html", nil)
+	if err != nil {
+		log.Println("error executing template:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
 }
 
 func handleRegisterAuth(w http.ResponseWriter, r *http.Request) {
@@ -96,6 +99,7 @@ func handleChangeNickname(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
+
 	err = readResponse(w, r, resp)
 	if err != nil {
 		return
@@ -149,11 +153,13 @@ func readResponse(w http.ResponseWriter, r *http.Request, responsePB *pb.Respons
 	resp := convertRequestPBToRequestStructure(responsePB)
 	if resp.ResponseID == model.ResponseForbidden || resp.ResponseID == model.ResponseError {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
-	} else {
-		userData := resp.Data[model.CodeUser]
-		http.Redirect(w, r, "/info", http.StatusSeeOther)
-		templates.ExecuteTemplate(w, "info.html", userData)
+		return nil
 	}
+
+	userData := resp.Data[model.CodeUser]
+	http.Redirect(w, r, "/info", http.StatusSeeOther)
+	templates.ExecuteTemplate(w, "info.html", userData)
+
 	return nil
 }
 
