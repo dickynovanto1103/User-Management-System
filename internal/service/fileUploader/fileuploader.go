@@ -13,6 +13,7 @@ func UploadFile(r *http.Request, fieldname string, username string) (string, err
 	r.ParseMultipartForm(MaxFileSize)
 	file, handler, err := r.FormFile(fieldname)
 	log.Println("file, handler, err: ", file, handler, err)
+
 	defer file.Close()
 	if err != nil {
 		log.Println("error retrieving file with err:", err)
@@ -26,6 +27,8 @@ func UploadFile(r *http.Request, fieldname string, username string) (string, err
 		log.Println("error in opening file: ", err)
 		return "", err
 	}
+
 	io.Copy(f, file)
+
 	return filename, nil
 }

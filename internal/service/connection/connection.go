@@ -25,8 +25,10 @@ func (cp *ConnPool) CreatePool(maxConnections int) error {
 		}
 		cp.FreeConn <- conn
 	}
+
 	cp.MaxConnections = maxConnections
 	cp.NumConnections = maxConnections
+
 	return nil
 }
 
@@ -46,8 +48,10 @@ func (cp *ConnPool) CreateNewConnection() error {
 			log.Println("error in dialing tcp", err)
 			return err
 		}
+
 		cp.FreeConn <- conn
 		cp.NumConnections++
 	}
+
 	return nil
 }

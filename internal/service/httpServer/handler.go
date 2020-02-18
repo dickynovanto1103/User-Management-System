@@ -174,6 +174,7 @@ func getUserDataFromTCPServer(r *http.Request) (model.User, error) {
 		log.Println("error retrieving cookie: ", err)
 		return model.User{}, err
 	}
+
 	var mapper = make(map[string]string)
 	mapper[model.CodeCookie] = cookie.Value
 	resp, err := sendRequest(model.RequestUserInfo, mapper, container.Client)
@@ -185,10 +186,10 @@ func getUserDataFromTCPServer(r *http.Request) (model.User, error) {
 
 	if resp.ResponseID == model.ResponseForbidden {
 		return model.User{}, errors.New(CodeForbidden)
-	} else {
-		userData := getUserFromDataInResponse(resp.GetMapper())
-		return userData, nil
 	}
+
+	userData := getUserFromDataInResponse(resp.GetMapper())
+	return userData, nil
 }
 
 func getUserFromDataInResponse(mapper map[string]string) model.User {

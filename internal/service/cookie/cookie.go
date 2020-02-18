@@ -19,5 +19,6 @@ func GetCookie(r *http.Request) (*http.Cookie, error) {
 		log.Println("getting error in retrieving cookie", err, cookie)
 		return nil, errors.New("Forbidden")
 	}
+
 	return cookie, nil
 }
