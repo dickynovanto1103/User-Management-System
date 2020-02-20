@@ -1,11 +1,12 @@
 package main
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/dickynovanto1103/User-Management-System/container"
 	"github.com/dickynovanto1103/User-Management-System/internal/service/httpServer"
 	"google.golang.org/grpc"
-	"log"
-	"net/http"
 )
 
 func main() {
