@@ -25,6 +25,9 @@ jobs:
           fi
 
       - name: Build
-        run: go build -v .
+        run: |
+          go build -v cmd/httpServer/httpserver.go
+          go build -v cmd/tcpServer/tcpserver.go
+          go build -v cmd/pictureServer/pictureserver.go
       - name: Test
         run: go test -v ./...
