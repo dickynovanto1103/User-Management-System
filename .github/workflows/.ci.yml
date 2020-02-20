@@ -14,11 +14,16 @@ jobs:
       - name: Pwd
         run: pwd
       - name: Build HTTP Server
-        run: go build -v ./cmd/httpServer/
+        run: |
+          cd cmd/httpServer/
+          go build -v
       - name: Build TCP Server
-        run: go build -v ./cmd/tcpServer/
+        run: |
+          pwd
+          cd cmd/tcpServer/
+          go build -v
       - name: Build Picture Server
-        run: go build -v ./cmd/pictureServer/
+        run: go build -v cmd/pictureServer/
   test:
     name: Test go packages
     runs-on: ubuntu-latest
