@@ -16,18 +16,11 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
 
-      - name: Get dependencies
-        run: |
-          go get -v -t -d ./...
-          if [ -f Gopkg.toml ]; then
-              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-              dep ensure
-          fi
-
-      - name: Build
-        run: |
-          go build -v cmd/httpServer/httpserver.go
-          go build -v cmd/tcpServer/tcpserver.go
-          go build -v cmd/pictureServer/pictureserver.go
+      - name: Build HTTP Server
+        run: go build -v cmd/httpServer/httpserver.go
+      - name: Build TCP Server
+        run: go build -v cmd/tcpServer/tcpserver.go
+      - name: Build Picture Server
+        run: go build -v cmd/pictureServer/pictureserver.go
       - name: Test
         run: go test -v ./...
