@@ -17,11 +17,11 @@ jobs:
         uses: actions/checkout@v1
 
       - name: Build HTTP Server
-        run: go build -v cmd/httpServer/httpserver.go
+        run: go build -v cmd/httpserver/httpserver.go
       - name: Build TCP Server
-        run: go build -v cmd/tcpServer/tcpserver.go
+        run: go build -v cmd/tcpserver/tcpserver.go
       - name: Build Picture Server
-        run: go build -v cmd/pictureServer/pictureserver.go
+        run: go build -v cmd/pictureserver/pictureserver.go
   test:
     name: Test
     runs-on: ubuntu-latest
