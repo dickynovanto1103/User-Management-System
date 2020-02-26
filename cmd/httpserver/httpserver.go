@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/dickynovanto1103/User-Management-System/container"
-	httpserver "github.com/dickynovanto1103/User-Management-System/internal/service/httpServer"
+	"github.com/dickynovanto1103/User-Management-System/internal/service/httpserver"
 	"google.golang.org/grpc"
 )
 

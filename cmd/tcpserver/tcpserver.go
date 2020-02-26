@@ -6,7 +6,7 @@ import (
 	"net"
 
 	"github.com/dickynovanto1103/User-Management-System/container"
-	tcpserver "github.com/dickynovanto1103/User-Management-System/internal/service/tcpServer"
+	tcpServer "github.com/dickynovanto1103/User-Management-System/internal/service/tcpserver"
 	"google.golang.org/grpc"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -22,7 +22,7 @@ type server struct {
 func (s *server) SendRequest(ctx context.Context, in *pb.Request) (*pb.Response, error) {
 	requestID := in.GetRequestID()
 	mapper := in.GetMapper()
-	response := tcpserver.HandleRequest(requestID, mapper)
+	response := tcpServer.HandleRequest(requestID, mapper)
 	newResponse := &pb.Response{
 		ResponseID:           response.ResponseID,
 		Mapper:               response.Data,

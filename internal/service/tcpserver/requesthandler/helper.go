@@ -7,7 +7,7 @@ import (
 	"github.com/dickynovanto1103/User-Management-System/container"
 	"github.com/dickynovanto1103/User-Management-System/internal/model"
 	"github.com/dickynovanto1103/User-Management-System/internal/repository/redis"
-	responsehandler "github.com/dickynovanto1103/User-Management-System/internal/service/tcpServer/responseHandler"
+	"github.com/dickynovanto1103/User-Management-System/internal/service/tcpserver/responsehandler"
 )
 
 func getUserData(username string, redis redis.Redis) (model.User, error) {

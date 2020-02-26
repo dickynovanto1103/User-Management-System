@@ -6,7 +6,7 @@ import (
 	"github.com/dickynovanto1103/User-Management-System/internal/model"
 	"github.com/dickynovanto1103/User-Management-System/internal/repository/dbsql"
 	"github.com/dickynovanto1103/User-Management-System/internal/repository/redis"
-	responsehandler "github.com/dickynovanto1103/User-Management-System/internal/service/tcpServer/responseHandler"
+	"github.com/dickynovanto1103/User-Management-System/internal/service/tcpserver/responsehandler"
 )
 
 type UpdateNicknameHandler struct{}

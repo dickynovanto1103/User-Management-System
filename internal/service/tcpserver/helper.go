@@ -3,7 +3,7 @@ package tcpserver
 import (
 	"github.com/dickynovanto1103/User-Management-System/container"
 	"github.com/dickynovanto1103/User-Management-System/internal/model"
-	requesthandler "github.com/dickynovanto1103/User-Management-System/internal/service/tcpServer/requestHandler"
+	"github.com/dickynovanto1103/User-Management-System/internal/service/tcpserver/requesthandler"
 )
 
 var mapperReqIdToCommand = map[int]requesthandler.RequestHandler{
