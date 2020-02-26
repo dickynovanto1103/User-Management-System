@@ -1,4 +1,4 @@
-package responseHandler
+package responsehandler
 
 import (
 	"github.com/dickynovanto1103/User-Management-System/internal/model"

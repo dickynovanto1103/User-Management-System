@@ -5,12 +5,12 @@ import (
 	"net/http"
 
 	"github.com/dickynovanto1103/User-Management-System/container"
-	"github.com/dickynovanto1103/User-Management-System/internal/service/httpServer"
+	httpserver "github.com/dickynovanto1103/User-Management-System/internal/service/httpServer"
 	"google.golang.org/grpc"
 )
 
 func main() {
-	httpServer.HandleRouting()
+	httpserver.HandleRouting()
 
 	conn, err := grpc.Dial(":8081", grpc.WithInsecure())
 	if err != nil {

@@ -1,4 +1,4 @@
-package httpServer
+package httpserver
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"github.com/dickynovanto1103/User-Management-System/internal/repository/dbsql"
 	"github.com/dickynovanto1103/User-Management-System/internal/service/authentication"
 	"github.com/dickynovanto1103/User-Management-System/internal/service/cookie"
-	"github.com/dickynovanto1103/User-Management-System/internal/service/fileUploader"
+	fileuploader "github.com/dickynovanto1103/User-Management-System/internal/service/fileUploader"
 	pb "github.com/dickynovanto1103/User-Management-System/proto"
 )
 
@@ -114,7 +114,7 @@ func handleChangeProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filename, err := fileUploader.UploadFile(r, model.CodeProfile, cookie.Value)
+	filename, err := fileuploader.UploadFile(r, model.CodeProfile, cookie.Value)
 
 	var mapper = make(map[string]string)
 	mapper[model.CodeProfile] = filename

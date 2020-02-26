@@ -1,4 +1,4 @@
-package requestHandler
+package requesthandler
 
 import (
 	"time"

@@ -1,4 +1,4 @@
-package requestHandler
+package requesthandler
 
 import (
 	"log"
@@ -7,7 +7,7 @@ import (
 	"github.com/dickynovanto1103/User-Management-System/container"
 	"github.com/dickynovanto1103/User-Management-System/internal/model"
 	"github.com/dickynovanto1103/User-Management-System/internal/repository/redis"
-	"github.com/dickynovanto1103/User-Management-System/internal/service/tcpServer/responseHandler"
+	responsehandler "github.com/dickynovanto1103/User-Management-System/internal/service/tcpServer/responseHandler"
 )
 
 func getUserData(username string, redis redis.Redis) (model.User, error) {
@@ -52,16 +52,16 @@ func setUserDataCache(data model.User, redis redis.Redis) {
 func sendResponseBack(username string, err error, redis redis.Redis) model.Response {
 	if err != nil {
 		log.Println("error update statement", err)
-		return responseHandler.ResponseForbidden()
+		return responsehandler.ResponseForbidden()
 	}
 
 	data, err := getUserData(username, redis)
 	if err != nil {
 		log.Println("error getting user data from database: ", err)
-		return responseHandler.ResponseForbidden()
+		return responsehandler.ResponseForbidden()
 	}
 
-	return responseHandler.ResponseUser(data)
+	return responsehandler.ResponseUser(data)
 }
 
 func GetUser(username string) (model.User, error) {
