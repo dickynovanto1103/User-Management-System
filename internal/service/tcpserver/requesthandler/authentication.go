@@ -9,8 +9,10 @@ import (
 	"github.com/dickynovanto1103/User-Management-System/internal/service/authentication"
 )
 
+// AuthenticationHandler authentication request handler
 type AuthenticationHandler struct{}
 
+// HandleRequest method for handling authentication request
 func (handler *AuthenticationHandler) HandleRequest(mapper map[string]string, redis redis.Redis) model.Response {
 	username := mapper[model.CodeUsername]
 	password := mapper[model.CodePassword]
