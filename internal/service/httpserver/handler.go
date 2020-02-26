@@ -14,7 +14,7 @@ import (
 	"github.com/dickynovanto1103/User-Management-System/internal/repository/dbsql"
 	"github.com/dickynovanto1103/User-Management-System/internal/service/authentication"
 	"github.com/dickynovanto1103/User-Management-System/internal/service/cookie"
-	fileuploader "github.com/dickynovanto1103/User-Management-System/internal/service/fileUploader"
+	"github.com/dickynovanto1103/User-Management-System/internal/service/fileuploader"
 	pb "github.com/dickynovanto1103/User-Management-System/proto"
 )
 
