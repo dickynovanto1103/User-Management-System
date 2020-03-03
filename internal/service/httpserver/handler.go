@@ -20,6 +20,14 @@ import (
 
 var templates = template.Must(template.ParseGlob("internal/service/httpServer/templates/*"))
 
+func handleHome(w http.ResponseWriter, r *http.Request) {
+	err := templates.ExecuteTemplate(w, "home.html", nil)
+	if err != nil {
+		log.Println("error executing template home", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func handleLogin(w http.ResponseWriter, r *http.Request) {
 	err := templates.ExecuteTemplate(w, "login.html", nil)
 	if err != nil {

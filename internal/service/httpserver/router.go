@@ -5,6 +5,7 @@ import (
 )
 
 func HandleRouting() {
+	http.HandleFunc("/", handleHome)
 	http.HandleFunc("/login/", handleLogin)
 	http.HandleFunc("/authenticate", handleAuthenticate)
 	http.HandleFunc("/register/", handleRegister)
