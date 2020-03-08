@@ -13,7 +13,7 @@ var mapperReqIdToCommand = map[int]requesthandler.RequestHandler{
 	model.RequestUpdateProfile:  &requesthandler.UpdateProfileHandler{},
 }
 
-func HandleRequest(requestID int32, mapper map[string]string) model.Response {
+func HandleRequest(requestID int32, mapper map[string]string, repo *container.Repository) model.Response {
 	command := mapperReqIdToCommand[int(requestID)]
-	return command.HandleRequest(mapper, container.RedisImpl)
+	return command.HandleRequest(mapper, repo.RedisImpl, repo.SQLStatements)
 }

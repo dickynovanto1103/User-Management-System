@@ -11,7 +11,7 @@ import (
 
 type UpdateNicknameHandler struct{}
 
-func (handler *UpdateNicknameHandler) HandleRequest(mapper map[string]string, redis redis.Redis) model.Response {
+func (handler *UpdateNicknameHandler) HandleRequest(mapper map[string]string, redis redis.Redis, db dbsql.DB) model.Response {
 	nickname := mapper[model.CodeNickname]
 	cookieValue := mapper[model.CodeCookie]
 	username, err := redis.Get(cookieValue)
@@ -21,13 +21,13 @@ func (handler *UpdateNicknameHandler) HandleRequest(mapper map[string]string, re
 		return responsehandler.ResponseForbidden()
 	}
 
-	err = UpdateNickname(nickname, username)
+	err = db.UpdateNickname(nickname, username)
 	if err != nil {
 		log.Println(dbsql.ErrorUpdateProfile + " " + err.Error())
 		return responsehandler.ResponseError(err)
 	}
-	user, err := GetUser(username)
+	user, err := db.GetUser(username)
 	setUserDataCache(user, redis)
 
-	return sendResponseBack(username, err, redis)
+	return sendResponseBack(username, err, redis, db)
 }

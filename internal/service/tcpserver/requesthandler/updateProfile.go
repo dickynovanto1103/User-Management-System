@@ -11,7 +11,7 @@ import (
 
 type UpdateProfileHandler struct{}
 
-func (handler *UpdateProfileHandler) HandleRequest(mapper map[string]string, redis redis.Redis) model.Response {
+func (handler *UpdateProfileHandler) HandleRequest(mapper map[string]string, redis redis.Redis, db dbsql.DB) model.Response {
 	profile := mapper[model.CodeProfile]
 	userIDFromCookie := mapper[model.CodeCookie]
 	username, err := redis.Get(userIDFromCookie)
@@ -20,13 +20,13 @@ func (handler *UpdateProfileHandler) HandleRequest(mapper map[string]string, red
 		log.Println("error when getting user from cookie ", err)
 		return responsehandler.ResponseForbidden()
 	}
-	err = UpdateProfile(profile, username)
+	err = db.UpdateProfile(profile, username)
 	if err != nil {
 		log.Println(dbsql.ErrorUpdateProfile + " " + err.Error())
 		return responsehandler.ResponseError(err)
 	}
-	user, err := GetUser(username)
+	user, err := db.GetUser(username)
 	setUserDataCache(user, redis)
 
-	return sendResponseBack(username, err, redis)
+	return sendResponseBack(username, err, redis, db)
 }

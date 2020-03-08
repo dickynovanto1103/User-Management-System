@@ -3,6 +3,8 @@ package requesthandler
 import (
 	"time"
 
+	"github.com/dickynovanto1103/User-Management-System/internal/repository/dbsql"
+
 	"github.com/dickynovanto1103/User-Management-System/internal/common/stringutil"
 	"github.com/dickynovanto1103/User-Management-System/internal/model"
 	"github.com/dickynovanto1103/User-Management-System/internal/repository/redis"
@@ -13,10 +15,10 @@ import (
 type AuthenticationHandler struct{}
 
 // HandleRequest method for handling authentication request
-func (handler *AuthenticationHandler) HandleRequest(mapper map[string]string, redis redis.Redis) model.Response {
+func (handler *AuthenticationHandler) HandleRequest(mapper map[string]string, redis redis.Redis, db dbsql.DB) model.Response {
 	username := mapper[model.CodeUsername]
 	password := mapper[model.CodePassword]
-	err := authentication.Authenticate(&username, &password)
+	err := authentication.Authenticate(&username, &password, db)
 	mapperResp := make(map[string]string)
 	if err != nil {
 		if err.Error() == authentication.ErrorNotAuthenticated {

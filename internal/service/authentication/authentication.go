@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"errors"
 
-	"github.com/dickynovanto1103/User-Management-System/container"
 	"github.com/dickynovanto1103/User-Management-System/internal/repository/dbsql"
 
 	"golang.org/x/crypto/pbkdf2"
@@ -23,8 +22,8 @@ func VerifyPassword(storedPassword string, inputPassword string) bool {
 	return storedPassword == strHashedPassword
 }
 
-func Authenticate(username *string, password *string) error {
-	pass, err := getPassword(*username)
+func Authenticate(username *string, password *string, dbOperation dbsql.DB) error {
+	pass, err := dbOperation.GetPassword(*username)
 	if err != nil {
 		return errors.New(dbsql.ErrorGetPassword)
 	}
@@ -34,10 +33,4 @@ func Authenticate(username *string, password *string) error {
 	} else {
 		return errors.New(ErrorNotAuthenticated)
 	}
-}
-
-func getPassword(username string) (string, error) {
-	var pass string
-	err := container.StatementQueryPassword.QueryRow(username).Scan(&pass)
-	return pass, err
 }
