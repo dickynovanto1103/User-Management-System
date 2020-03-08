@@ -17,12 +17,13 @@ import (
 
 type server struct {
 	pb.UnimplementedUserDataServiceServer
+	repository *container.Repository
 }
 
 func (s *server) SendRequest(ctx context.Context, in *pb.Request) (*pb.Response, error) {
 	requestID := in.GetRequestID()
 	mapper := in.GetMapper()
-	response := tcpServer.HandleRequest(requestID, mapper)
+	response := tcpServer.HandleRequest(requestID, mapper, s.repository)
 	newResponse := &pb.Response{
 		ResponseID:           response.ResponseID,
 		Mapper:               response.Data,
@@ -42,12 +43,14 @@ func main() {
 		log.Println("error found in listening: ", err)
 	}
 
-	container.BuildTCPServerDep()
+	repository := container.BuildTCPServerDep()
 
-	defer container.DBImpl.CloseDB()
+	defer repository.DBImpl.CloseDB()
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterUserDataServiceServer(grpcServer, &server{})
+	pb.RegisterUserDataServiceServer(grpcServer, &server{
+		repository: repository,
+	})
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
