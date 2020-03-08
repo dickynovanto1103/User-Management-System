@@ -1,13 +1,12 @@
 package dbsql
 
 import (
-	"database/sql"
+	"github.com/dickynovanto1103/User-Management-System/internal/model"
 )
 
 type DB interface {
-	PrepareQueryUser() (*sql.Stmt, error)
-	PrepareUpdateNickname() (*sql.Stmt, error)
-	PrepareUpdateProfile() (*sql.Stmt, error)
-	PrepareQueryPassword() (*sql.Stmt, error)
-	CloseDB()
+	GetUser(username string) (model.User, error)
+	UpdateNickname(nickname, username string) error
+	UpdateProfile(profile, username string) error
+	GetPassword(username string) (string, error)
 }
