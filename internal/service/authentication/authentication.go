@@ -28,9 +28,9 @@ func Authenticate(username string, password string, dbOperation dbsql.DB) error 
 		return errors.New(dbsql.ErrorGetPassword)
 	}
 
-	if VerifyPassword(pass, password) {
-		return nil
-	} else {
+	if !VerifyPassword(pass, password) {
 		return errors.New(ErrorNotAuthenticated)
 	}
+
+	return nil
 }
