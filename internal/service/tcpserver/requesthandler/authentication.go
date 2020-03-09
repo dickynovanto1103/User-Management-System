@@ -18,7 +18,7 @@ type AuthenticationHandler struct{}
 func (handler *AuthenticationHandler) HandleRequest(mapper map[string]string, redis redis.Redis, db dbsql.DB) model.Response {
 	username := mapper[model.CodeUsername]
 	password := mapper[model.CodePassword]
-	err := authentication.Authenticate(&username, &password, db)
+	err := authentication.Authenticate(username, password, db)
 	mapperResp := make(map[string]string)
 	if err != nil {
 		if err.Error() == authentication.ErrorNotAuthenticated {

@@ -22,13 +22,13 @@ func VerifyPassword(storedPassword string, inputPassword string) bool {
 	return storedPassword == strHashedPassword
 }
 
-func Authenticate(username *string, password *string, dbOperation dbsql.DB) error {
-	pass, err := dbOperation.GetPassword(*username)
+func Authenticate(username string, password string, dbOperation dbsql.DB) error {
+	pass, err := dbOperation.GetPassword(username)
 	if err != nil {
 		return errors.New(dbsql.ErrorGetPassword)
 	}
 
-	if VerifyPassword(pass, *password) {
+	if VerifyPassword(pass, password) {
 		return nil
 	} else {
 		return errors.New(ErrorNotAuthenticated)
