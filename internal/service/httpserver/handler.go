@@ -135,8 +135,6 @@ func handleChangeProfile(w http.ResponseWriter, r *http.Request) {
 	err = readResponse(w, r, resp)
 }
 
-const CodeForbidden = "Forbidden"
-
 func sendRequest(requestID int, mapper map[string]string, client pb.UserDataServiceClient) (*pb.Response, error) {
 	request := &pb.Request{
 		RequestID:            int32(requestID),
@@ -199,7 +197,7 @@ func getUserDataFromTCPServer(r *http.Request) (model.User, error) {
 	}
 
 	if resp.ResponseID == model.ResponseForbidden {
-		return model.User{}, errors.New(CodeForbidden)
+		return model.User{}, errors.New(model.ResponseKeyForbidden)
 	}
 
 	userData := getUserFromDataInResponse(resp.GetMapper())

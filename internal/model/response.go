@@ -10,6 +10,6 @@ const (
 	ResponseForbidden    = 2
 	ResponseError        = 3
 	ResponseCode         = "response"
-	ResponseKeyForbidden = "Forbidden"
-	ResponseKeyError     = "Error"
+	ResponseKeyForbidden = "forbidden"
+	ResponseKeyError     = "error"
 )
