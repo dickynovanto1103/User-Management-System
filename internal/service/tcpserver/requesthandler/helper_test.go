@@ -54,6 +54,23 @@ func TestGetUserDataFromCacheErrorProfile(t *testing.T) {
 	assert.Equal(t, err, fmt.Errorf("error getting key user1profile"))
 }
 
+func TestGetUserDataCacheSuccessful(t *testing.T) {
+	mockRedisCtrl, mockRedis := getRedisNormal(t)
+	mockDBCtrl, mockDB := getDBMock(t)
+	defer mockRedisCtrl.Finish()
+	defer mockDBCtrl.Finish()
+
+	username := "user1"
+	user, err := getUserData(username, mockRedis, mockDB)
+	expectedUser := model.User{
+		Username:   username,
+		Nickname:   username,
+		ProfileURL: "default",
+	}
+	assert.Equal(t, user, expectedUser)
+	assert.Equal(t, err, nil)
+}
+
 func getRedisNormal(t *testing.T) (*gomock.Controller, redis.Redis) {
 	mockCtrl := gomock.NewController(t)
 	mockRedis := redis.NewMockRedis(mockCtrl)
@@ -102,23 +119,6 @@ func getRedisErrorGetProfile(t *testing.T) (*gomock.Controller, redis.Redis) {
 	mockRedis.EXPECT().Get(key).Return("", fmt.Errorf("error getting key %v", key))
 
 	return mockCtrl, mockRedis
-}
-
-func TestGetUserDataCacheSuccessful(t *testing.T) {
-	mockRedisCtrl, mockRedis := getRedisNormal(t)
-	mockDBCtrl, mockDB := getDBMock(t)
-	defer mockRedisCtrl.Finish()
-	defer mockDBCtrl.Finish()
-
-	username := "user1"
-	user, err := getUserData(username, mockRedis, mockDB)
-	expectedUser := model.User{
-		Username:   username,
-		Nickname:   username,
-		ProfileURL: "default",
-	}
-	assert.Equal(t, user, expectedUser)
-	assert.Equal(t, err, nil)
 }
 
 func getDBMock(t *testing.T) (*gomock.Controller, dbsql.DB) {
